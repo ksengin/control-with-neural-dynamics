@@ -17,6 +17,31 @@ class SystemDynamics:
         else: raise NotImplementedError()
 
 
+class LearnedSystem(ControlledSystemTemplate):
+    """
+    Control of a learned system
+    """
+    def __init__(self, model, dubins_car=False, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+        self.dubins_car = dubins_car
+
+    def dynamics(self, t, x):
+        self.nfe += 1 # increment number of function evaluations
+        u = self._evaluate_controller(t, x)
+        self.u_vals.append(u)
+
+        # Differential equations
+        if self.dubins_car:
+            vs = (u[:, 1:] + 1) / 2
+            xus = torch.cat([x, u[:, :1], vs], -1)
+        else:
+            xus = torch.cat([x, u], -1)
+
+        self.cur_f = self.model(xus)
+        return self.cur_f
+
+
 class SingleIntegrator(ControlledSystemTemplate):
     """
     Single integrator model
@@ -102,31 +127,6 @@ class ReedsShepp(ControlledSystemTemplate):
         dtheta = u[:, :1] * vs / self.rad
         
         self.cur_f = torch.cat([dx, dy, dtheta * torch.ones_like(dx)], -1)
-        return self.cur_f
-
-
-class LearnedSystem(ControlledSystemTemplate):
-    """
-    Dubins car with varying speed
-    """
-    def __init__(self, model, dubins_car=False, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.model = model
-        self.dubins_car = dubins_car
-
-    def dynamics(self, t, x):
-        self.nfe += 1 # increment number of function evaluations
-        u = self._evaluate_controller(t, x)
-        self.u_vals.append(u)
-
-        # Differential equations
-        if self.dubins_car:
-            vs = (u[:, 1:] + 1) / 2
-            xus = torch.cat([x, u[:, :1], vs], -1)
-        else:
-            xus = torch.cat([x, u], -1)
-
-        self.cur_f = self.model(xus)
         return self.cur_f
 
 

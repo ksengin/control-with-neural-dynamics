@@ -246,24 +246,24 @@ def get_args():
     parser.add('-c', '--config_filepath', required=False, is_config_file=True, help='Path to config file.')
 
     parser.add_argument('--system', type=str, 
-        choices=['single_integrator', 'dubins', 'dubins_varyv', 'reedsshepp', 'quadrotor', 'acrobot', 'cartpole', 'nimblearm', 'nimblearmjoint', 'nimblehusky'])
+        choices=['single_integrator', 'dubins', 'dubins_varyv', 'reedsshepp', 'quadrotor', 'acrobot', 'cartpole'])
     parser.add_argument('--fk_act_fn', type=str, default='sine', choices=['relu', 'sine'])
     parser.add_argument('--fk_wjac', action='store_true', help='train fknet with jacobians if true')
     parser.add_argument('--value_net', type=str, default='phi', choices=['phi', 'sinephi'])
+    parser.add_argument('--n_resnet_layers', type=int, default=2)
     parser.add_argument('--archive', type=str)
     parser.add_argument('--archive_fkmodel', type=str)
 
     parser.add_argument('--learned_fk', action='store_true', help='use learned dynamics if true')
     parser.add_argument('--init_sampling', type=str, default='fixed', choices=['fixed', 'rand', 'single'])
-    parser.add_argument('--sess', type=str, default='dubins')
+    parser.add_argument('--sess', type=str, default='dubins', help='name for the log directory')
     parser.add_argument('--scale_action', type=float, default=1., help='scale the action limits, optionally')
-    parser.add_argument('--ws_len', type=float, default=5)
+
+    # Environment settings
     parser.add_argument('--use_obstacle', action='store_true')
     parser.add_argument('--obs_penalty', type=float, default=100.)
     parser.add_argument('--obs_clip', action='store_true', help='clip dx/dt when obstacle penetration if true')
     parser.add_argument('--disturbance', type=str, choices=['turbulence', 'const', 'spiral', 'sinks', 'vortex'])
-    parser.add_argument('--k_ext_force', type=float, default=1.)
-    parser.add_argument('--n_resnet_layers', type=int, default=2)
 
     parser.add_argument('--t_final', type=float, default=4)
     parser.add_argument('--dt', type=float, default=0.02)
