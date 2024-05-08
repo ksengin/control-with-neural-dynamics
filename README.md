@@ -6,7 +6,7 @@ Implementation of "Neural Optimal Control using Learned System Dynamics"
 
 ## Install
 
-1. Clone this repository and navigate to src folder
+1. Clone this repository and navigate to `src` folder
 ```bash
 git clone https://github.com/ksengin/control-with-neural-dynamics.git
 cd src
@@ -46,9 +46,12 @@ To train a controller using a previously learned state transitions network, you 
 python train_controller.py --learned_fk --system cartpole --sess cnd_cartpole --archive_fkmodel logs/cnd_cartpole/systemid_model_f_cartpole_sine.pth
 ```
 
+After training, state evolutions using the controller with the neural and true forward kinematics models are saved under the `logs` directory to `result_eval_surrogatefk.pdf` and `result_eval_truefk.pdf`, respectively.
+
+
 ## Acknowledgments
 
-This codebase built on top of the following repositories:
+This codebase is built on top of the following repositories:
 
 - https://github.com/donken/NeuralOC
 - https://github.com/DiffEqML/torchcontrol
