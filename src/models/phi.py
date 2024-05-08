@@ -3,10 +3,7 @@ import torch.nn as nn
 import copy
 
 def antiderivTanh(x): # activation function aka the antiderivative of tanh
-    # ## TODO: test the following expression instead
-    # return torch.log(1 + torch.exp(2.0 * x)) - x
     return torch.abs(x) + torch.log(1+torch.exp(-2.0*torch.abs(x)))
-    # return torch.log(torch.exp(x) + torch.exp(-x)) # numerically unstable
 
 def derivTanh(x): # act'' aka the second derivative of the activation function antiderivTanh
     return 1 - torch.pow( torch.tanh(x) , 2 )

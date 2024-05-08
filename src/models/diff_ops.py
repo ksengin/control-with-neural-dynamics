@@ -1,4 +1,4 @@
-# Taken from https://github.com/vsitzmann/siren/blob/master/diff_operators.py
+# Adapted from https://github.com/vsitzmann/siren/blob/master/diff_operators.py
 
 import torch
 from torch.autograd import grad

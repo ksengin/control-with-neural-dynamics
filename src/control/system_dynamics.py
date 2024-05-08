@@ -1,6 +1,4 @@
 import torch
-from warnings import warn
-from torch import cos, sin
 from math import pi
 from .template import ControlledSystemTemplate
 

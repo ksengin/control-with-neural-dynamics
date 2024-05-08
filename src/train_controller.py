@@ -161,35 +161,35 @@ def main(args):
         for epoch in eps:    
             x0 = init_dist.sample((bs,)).to(device)
             trajectory, actions = robot(x0, t_span)
-            
+
             terminal_cost = torch.norm(w_P * (trajectory[-1] - x_star), p=2, dim=-1)
             running_cost = torch.norm(w_R * (actions - u_star), p=2, dim=-1)
-            
+
             t_span_ = t_span[:, None, None].repeat(1, bs, 1)
             xt = torch.cat((trajectory, t_span_), -1)
             dVdx = v_net.get_grad(xt.view(-1, x_dim + 1)).reshape(t_span.shape[0], bs, -1)
-            
+
             if not args.learned_fk:
                 dxdt = f_system(trajectory[:-1], actions)
             else:
                 dxdt = fk_model(torch.cat((trajectory[:-1], actions), -1))
 
             H = running_cost + (dVdx[:-1, :, :x_dim] * dxdt).sum(-1)
-            loss_hamiltonian = gradient(H, actions).pow(2).mean()
-            
+            # NOTE: inclusion of this loss term causes NaNs after the backward pass
+            # in newer versions of torchdyn (to be fixed)
+            # loss_hamiltonian = gradient(H, actions).pow(2).mean()
+
             dVdt = dVdx[:-1, :, -1]
             loss_hjb = (dVdt - H).abs().mean()
-            
-            loss_end = (v_net(F.pad(trajectory[-1], [0, 1], value=tf)).squeeze() - terminal_cost).abs().mean()
-            
-            loss_cost = cost(trajectory, actions)
-            # loss = loss_cost * 10 + loss_hjb + loss_hamiltonian * 0.01 + loss_end * 0.01
-            loss = loss_cost * 10 + loss_hjb + loss_end * 0.01
 
+            loss_end = (v_net(F.pad(trajectory[-1], [0, 1], value=tf)).squeeze() - terminal_cost).abs().mean()
+
+            loss_cost = cost(trajectory, actions)
+            loss = loss_cost + loss_hjb + loss_end * 0.01
 
             if args.use_obstacle:
                 loss += sys_config.obstacle_fn(trajectory[..., :sys_config.obstacle_centers.shape[-1]], sys_config.obstacle_centers).mean()
-            
+
             losses.append(loss.detach().cpu().item())
             opt.zero_grad()
             loss.backward()
@@ -263,14 +263,12 @@ def get_args():
     parser.add_argument('--obs_clip', action='store_true', help='clip dx/dt when obstacle penetration if true')
     parser.add_argument('--disturbance', type=str, choices=['turbulence', 'const', 'spiral', 'sinks', 'vortex'])
     parser.add_argument('--k_ext_force', type=float, default=1.)
-
-    parser.add_argument('--x_dim', type=int, default=4)
-    parser.add_argument('--u_dim', type=int, default=2)
-    parser.add_argument('--t_final', type=float, default=4)
-    parser.add_argument('--dt', type=float, default=0.02)
     parser.add_argument('--n_resnet_layers', type=int, default=2)
 
-    # Cost
+    parser.add_argument('--t_final', type=float, default=4)
+    parser.add_argument('--dt', type=float, default=0.02)
+
+    # Cost weights (default values used for each system is none given)
     parser.add_argument('--w_P', type=float)
     parser.add_argument('--w_Q', type=float)
     parser.add_argument('--w_R', type=float)

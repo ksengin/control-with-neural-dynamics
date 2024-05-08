@@ -166,11 +166,6 @@ class NimbleHusky(NamedTuple):
 
     state_ub[10:] = 0.0001
     init_dist = torch.distributions.Uniform(state_lb, state_ub)
-    
-    # mean_: torch.tensor = torch.zeros(x_dim)
-    # mean_[4] = height
-    
-    # init_dist = torch.distributions.Normal(mean_, 0.01 * torch.ones(x_dim))
 
     x_star: torch.tensor = torch.cat((torch.tensor([0., 0., 0., 3., height, 0.]), torch.zeros(14))).to(device)
     u_star: float = 0.

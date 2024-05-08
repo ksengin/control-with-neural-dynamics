@@ -83,14 +83,3 @@ class BoxConstrainedController(nn.Module):
         '''Reinitialize last layer with zeros'''
         for p in self.layers[-1].parameters(): 
             nn.init.zeros_(p)
-            
-
-class RandConstController(nn.Module):
-    """Constant controller
-    We can use this for residual propagation and MPC steps (forward propagation)"""
-    def __init__(self, shape=(1,1), u_min=-1, u_max=1):
-        super().__init__()
-        self.u0 = torch.Tensor(*shape).uniform_(u_min, u_max)
-        
-    def forward(self, t, x):
-        return self.u0
