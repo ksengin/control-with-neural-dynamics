@@ -119,8 +119,6 @@ class LearnedSystem(ControlledSystemTemplate):
     def dynamics(self, t, x):
         self.nfe += 1 # increment number of function evaluations
         u = self._evaluate_controller(t, x)
-        # print('got learned control signal')
-        # import pdb; pdb.set_trace()
         self.u_vals.append(u)
 
         # Differential equations

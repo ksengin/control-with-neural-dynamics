@@ -1,3 +1,5 @@
+# Taken from https://github.com/vsitzmann/siren/blob/master/diff_operators.py
+
 import torch
 from torch.autograd import grad
 
@@ -69,7 +71,4 @@ def batch_jacobian(y, x):
         jac[:, i, :] = grad(y_flat, x, torch.ones_like(y_flat), create_graph=True)[0]
 
     return jac
-
-
-
 

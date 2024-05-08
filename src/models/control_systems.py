@@ -102,9 +102,6 @@ def f_quadrotor(xs, controls):
 
 def f_acrobot(xs, controls):
 
-    mass = 1.
-    gravity = 9.81
-
     state = xs
     action = controls
 
