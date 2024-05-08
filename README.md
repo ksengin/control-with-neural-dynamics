@@ -37,7 +37,7 @@ To use CND, you can run
 python train_controller.py --learned_fk --system cartpole --sess cnd_cartpole
 ```
 
-which first learns the state transitions of a system, then trains a controller network using the learned system. The checkpoints are saved under `logs/cnd_cartpole`.
+which first learns the state transitions of a system, then trains a controller network using the learned system. The checkpoints are saved under `logs/cnd_cartpole`. Currently supported systems include: 'cartpole', 'acrobot', 'quadrotor'.
 
 
 To train a controller using a previously learned state transitions network, you can use 
@@ -47,6 +47,15 @@ python train_controller.py --learned_fk --system cartpole --sess cnd_cartpole --
 ```
 
 After training, state evolutions using the controller with the neural and true forward kinematics models are saved under the `logs` directory to `result_eval_surrogatefk.pdf` and `result_eval_truefk.pdf`, respectively.
+
+### Training on custom systems
+
+To train CND on a custom system,
+
+- Write down the system equations in [src/models/control_systems.py](src/models/control_systems.py) to generate samples for supervising the state transitions network. Alternatively, you can use a simulator to generate data pairs.
+- Specify the system configuration in [src/system_config.py](src/system_config.py), including the state and action dimensions, desired state and action in the final timestep, cost function parameters and the distribution to sample initial states from.
+- (Optional) If you would like to test the performance of the controller subject to the true state transitions, implement the system equations in [src/control/system_dynamics.py](src/control/system_dynamics.py).
+
 
 
 ## Acknowledgments
